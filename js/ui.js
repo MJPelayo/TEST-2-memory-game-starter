@@ -118,6 +118,13 @@ export function createUI(eventBus, gameService, rootEl) {
     if (secondCard) secondCard.classList.remove('is-flipped');
   }
 
+  function resetAllCardClasses() {
+    const allCards = els.board.querySelectorAll('.card');
+    allCards.forEach(card => {
+      card.classList.remove('is-flipped', 'is-matched');
+    });
+  }
+
   function showWinOverlay(moves, elapsedSeconds) {
     // TODO (10): Show win overlay with stats
     els.winMoves.textContent = moves;
@@ -165,6 +172,7 @@ export function createUI(eventBus, gameService, rootEl) {
       renderBoard(cards);
       resetHud(totalPairs);
       hideWinOverlay();
+      resetAllCardClasses();
     });
     
     subscribe('game:cardFlipped', ({ cardId }) => {
