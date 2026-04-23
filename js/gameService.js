@@ -105,8 +105,6 @@ export function createGameService(eventBus) {
   }
 
   function flipCard(cardId) {
-    // TODO (7): implement the full flip flow
-    
     // Validation rules
     if (state.status !== 'playing') return;
     if (state.isLocked) return;
@@ -129,12 +127,15 @@ export function createGameService(eventBus) {
       // Second pick of the pair
       state.secondPickId = cardId;
       
+      // CRITICAL FIX: Emit cardFlipped for second card BEFORE match check
+      const secondCard = getCardById(cardId);
+      eventBus.emit('game:cardFlipped', { cardId: secondCard.id, symbol: secondCard.symbol });
+      
       // Increment move count
       state.moves++;
       eventBus.emit('game:moveCountChanged', { moves: state.moves });
       
       const firstCard = getCardById(state.firstPickId);
-      const secondCard = getCardById(state.secondPickId);
       
       if (firstCard.symbol === secondCard.symbol) {
         // MATCH found
@@ -146,28 +147,28 @@ export function createGameService(eventBus) {
         state.firstPickId = null;
         state.secondPickId = null;
         
-        eventBus.emit('game:matchFound', { 
-          firstId: firstCard.id, 
-          secondId: secondCard.id, 
-          matchedCount: state.matchedCount 
+        eventBus.emit('game:matchFound', {
+          firstId: firstCard.id,
+          secondId: secondCard.id,
+          matchedCount: state.matchedCount
         });
         
         // Check for win
         if (state.matchedCount === TOTAL_CARDS) {
           state.status = 'won';
           stopTimer();
-          eventBus.emit('game:won', { 
-            moves: state.moves, 
-            elapsedSeconds: state.elapsedSeconds 
+          eventBus.emit('game:won', {
+            moves: state.moves,
+            elapsedSeconds: state.elapsedSeconds
           });
         }
       } else {
         // NO MATCH
         state.isLocked = true;
         
-        eventBus.emit('game:matchFailed', { 
-          firstId: state.firstPickId, 
-          secondId: state.secondPickId 
+        eventBus.emit('game:matchFailed', {
+          firstId: state.firstPickId,
+          secondId: state.secondPickId
         });
         
         // Schedule flip back
