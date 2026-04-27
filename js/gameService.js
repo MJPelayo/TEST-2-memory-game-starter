@@ -132,6 +132,7 @@ export function createGameService(eventBus) {
       eventBus.emit('game:moveCountChanged', { moves: state.moves });
       
       const firstCard = getCardById(state.firstPickId);
+      const secondCard = getCardById(state.secondPickId);
       
       if (firstCard.symbol === secondCard.symbol) {
         // MATCH found
