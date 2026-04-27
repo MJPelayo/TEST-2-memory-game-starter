@@ -127,10 +127,6 @@ export function createGameService(eventBus) {
       // Second pick of the pair
       state.secondPickId = cardId;
       
-      // CRITICAL FIX: Emit cardFlipped for second card BEFORE match check
-      const secondCard = getCardById(cardId);
-      eventBus.emit('game:cardFlipped', { cardId: secondCard.id, symbol: secondCard.symbol });
-      
       // Increment move count
       state.moves++;
       eventBus.emit('game:moveCountChanged', { moves: state.moves });
